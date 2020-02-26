@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ibadan | Urban Planning</title>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v1.7.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v1.7.0/mapbox-gl.css' rel='stylesheet' />
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+        
+        #style_menu {
+            position: absolute;
+            font-size: 12px;
+            opacity: 50%;
+            top: 0;
+            bottom: 0;
+            width: 400px;
+        }
+        
+        #storymode {
+            position: absolute;
+            z-index: 1012022;
+            bottom: 0;
+            left: auto;
+            top: auto;
+            height: auto;
+            width: calc(100% - 20px);
+            background: rgba(12, 12, 12, 0.8);
+            color: #eee;
+            padding: 10px;
+            display: none;
+        }
+        
+        #storymode-content {
+            font-size: 12px;
+            line-height: 16px;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <style>
+        #map {
+            position: fixed;
+            width: 100vw;
+        }
+        
+        #style_menu {
+            position: relative;
+            background: #fff;
+            z-index: 1;
+            left: 150px;
+            top: -28px;
+            padding: 5px;
+            font-family: Arial, Helvetica, sans-serif;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        #fly_to_ibadan {
+            display: block;
+            position: absolute;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0px auto;
+            width: 100px;
+            height: 30px;
+            top: 10px;
+            z-index: 1;
+            left: 20px;
+            border: none;
+            border-radius: 3px;
+            font-size: 12px;
+            text-align: center;
+            color: #fff;
+            background: #383432;
+        }
+        
+        #formButton {
+            display: block;
+            position: absolute;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0px auto;
+            width: 100px;
+            height: 30px;
+            top: 10px;
+            z-index: 1;
+            left: 360px;
+            border: none;
+            border-radius: 3px;
+            font-size: 12px;
+            text-align: center;
+            color: #fff;
+            background: #383432;
+        }
+        
+        #fly_to_eleyele_reservior {
+            display: block;
+            position: fixed;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0px auto;
+            width: 100px;
+            height: 30px;
+            top: 50px;
+            z-index: 1;
+            left: 20px;
+            border: none;
+            border-radius: 3px;
+            font-size: 12px;
+            text-align: center;
+            color: #fff;
+            background: #383432;
+        }
+        
+        #menu {
+            background: #fff;
+            position: absolute;
+            display: none;
+            opacity: 90%;
+            z-index: 1;
+            top: 50px;
+            left: 10px;
+            border-radius: 3px;
+            width: 200px;
+            font-family: 'Open Sans', sans-serif;
+        }
+        
+        #menu a {
+            font-size: 12.5px;
+            color: #ec3030;
+            display: block;
+            border-radius: 10px;
+            margin: 0;
+            padding: 0;
+            padding: 10px;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+            text-align: center;
+        }
+        
+        #menu a:last-child {
+            border: none;
+        }
+        
+        #menu a:hover {
+            background-color: #f8f8f8;
+            color: black;
+        }
+        
+        #menu a.active {
+            background-color: #f3f3f3;
+            color: black;
+        }
+        
+        #menu a.active:hover {
+            background: #e3e6e9;
+        }
+        
+        #feedback {
+            background-color: #eff5ef;
+            border-radius: 5px;
+            display: none;
+            opacity: 70%;
+            position: fixed;
+            z-index: 1;
+            top: 150px;
+            left: 450px;
+            font-size: 12px;
+            font-family: 'Open Sans', sans-serif;
+            text-align: left;
+        }
+        
+        input[type=text] {
+            width: 50%;
+            height: 150%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;
+        }
+        
+        section {
+            height: 1050px;
+            padding: 25px 25px;
+            line-height: 25px;
+            border-bottom: 1px solid #ddd;
+            opacity: 0.25;
+            font-size: 13px;
+        }
+        
+        section.active {
+            opacity: 1;
+        }
+        
+        section:last-child {
+            border-bottom: none;
+            margin-bottom: 200px;
+        }
+        
+        #storycard {
+            width: 20vw;
+            position: relative;
+            display: block;
+            background: #fff;
+            padding: 0px;
+            padding-bottom: 0px;
+            top: 50px;
+            right: 0px;
+            font-family: 'Open Sans', sans-serif;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.01), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            z-index: 1;
+        }
+        
+        #about {
+            display: none;
+            background-color: transparent;
+            width: 1000px;
+            height: 500px;
+            top: 100px;
+            left: 200px;
+            z-index: 3;
+            position: fixed;
+            overflow: auto;
+            color: rgb(126, 128, 130);
+        }
+    </style>
+    <!-- <button id="formButton" style="left: 0px; top:70px" onclick="openForm()">builtup areas</button> -->
+
+    </div>
+    <div style="z-index: 2; position:fixed ; background-color: black; height: 50px; width: 1500px; opacity: 72%;">
+        <div style="color: #f0f3f5; letter-spacing: 2px; font-size:large; left:540px; padding-top: 15px; padding-left: 25px; font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif "><b>DATA4GOVERNANCE</b></div>
+        <div><button id="fly_to_ibadan" style="left: 250px; cursor: pointer;" onclick="location.reload()"><u>HOME</u></button>
+            <button id="formButton" onclick="openStory()" style="cursor: pointer;"><u>STORY</u></button>
+            <button id="formButton" onclick="openLayers()" style="left: 470px; cursor: pointer;"><u>LAYERS</u></button>
+            <button id="formButton" onclick="openForm()" style="left: 580px; cursor: pointer;"><u>FEEDBACK</u></button>
+            <button id="formButton" style="left: 1140px;cursor: pointer; background-color: #ec3030;"><a style="color: #ddd;" href="tel:1-562-867-5309"><u>EMERGENCY CALL</u></a></button>
+            <button id="formButton" onclick="location.href = 'https://medium.com/@somtomomah1/data4governance-hackerthon-a981ae96ec78'" style="left: 1250px;cursor: pointer;"><u>ABOUT</u></button></div>
+        <div id="style_menu" style="z-index: 2; left:690px;">
+            <input id="ck70io5013qtx1in38cnropdk" style="cursor: pointer;" type="radio" name="rtoggle" value="dark" checked="checked" />
+            <label for="dark">Dark</label>
+            <input id="ck70ibu9x1xpo1in0h02fafox" style="cursor: pointer;" type="radio" name="rtoggle" value="streets" />
+            <label for="streets">Streets</label>
+            <input id="ck70imtmx3bp61iodztcnyjqo" style="cursor: pointer;" type="radio" name="rtoggle" value="light" />
+            <label for="light">Light</label>
+            <input id="ck70ioxwz0ydx1ilu2vilzmhx" style="cursor: pointer;" type="radio" name="rtoggle" value="outdoors" />
+            <label for="outdoors">Outdoors</label>
+            <input id="ck70ipn8858n21io5pf8isdsc" style="cursor: pointer;" type="radio" name="rtoggle" value="satellite" />
+            <label for="satellite">Satellite</label>
+        </div>
+    </div>
+    <div id='storycard' style="width:350px;  height: 4300px; opacity: 70%">
+        <section id='home' class='active' style="height: 2px; ">
+            <p style="left:30px; color:rgb(173, 168, 168)"><b>SCROLL DOWN</b></p>
+        </section>
+        <section id='ibadan' style="top: 0px; height: 800px;">
+            <h3>Ibadan, The Capital of Oyo State</h3>
+            <p>Ibadan, the capital city of Oyo State and the third largest metropolitan area in Nigeria,
+                after Lagos and Kano is 128 km inland northeast of Lagos and 530 km southwest of
+                Abuja, the federal capital. It is a prominent transit point between the coastal region and
+                the areas to the north. Ibadan has a tropical wet and dry climate, with a lengthy wet
+                season and relatively constant temperatures throughout the course of the year. Ibadan’s,
+                wet season runs from March through October, though August sees somewhat of a lull in
+                precipitation. This lull nearly divides the wet season into two different wet seasons. The
+                remaining months forms the city’s dry season. Ibadan is highly exposed to flooding. The
+                city has a population of 3 million and a growth rate of 3.4% (City of Ibadan, 2013). It is
+                the largest metropolitan geographical area in West Africa (1,190 sq mi or 3,080 km2)
+                with a highly built up and dense population. The city is frequently exposed to floods.</p>
+                <img src="img/ibadan.png" alt="" width="300px">
+        </section>
+        <section style="height: 5px;">
+
+            
+        </section>
+        <section id='flooding' style="top: 80px">
+            <h3>History of Flooding in Ibadan</h3>
+            <p>The historical date of the first flooding in Ibadan has been a subject of debate while
+                Tomori recorded that the first flooding occurred in Ibadan in 1902, Etunovbe, 2011;
+                Ajayi et al 2012; Akintola, 1981, recorded that flooding has been a recurrent decimal in
+                Ibadan with recorded occurrences in 1948, 1955, 1961, 1963, 1978, 1980, 1985, 1987 and
+                1990 with the major sources of this flooding being Ogunpa and Kudeti streams. Ibadan
+                has recorded varying degrees of flooding. For instance, there were flooding in the
+                watersheds of Ogunpa and Kudeti streams (one of the two major streams in Ibadan) in
+                1955, 1960, 1961, 1963, 1969, 1978 and 1980. The flooding of 1969 is unique because it
+                resulted from a mere 25.4 mm rainfall. Eleyele Dam is the source of drinking water for
+                the part of the city of Ibadan that the Water Corporation of Oyo State water pipe lines
+                serves.
+            </p>
+            
+            <P>Built on the Ona River, Eleyele Dam has a total length of 244 meters and was constructed
+                at Eleyele in 1942. The dam was constructed to supply raw water for treatment at the
+                Eleyele Waterworks and for flood controls during high flow periods through its reservoir
+                holding capacity. In the aftermath of the August 26, 2011 devastating flood in the city,
+                Eleyele Dam was one of the major hydrological devices that were ravaged by the flood.</P>
+            <img src="img/flood damage 2.jpg" alt="" width="300px">
+        </section>
+        <section id='eleyele'>
+            <h3>Flooding</h3>
+            <p>Nigerian cities have experienced great physical development, in terms of building,
+                manufacturing industries and others without any appreciable infrastructures such as
+                drainages, roads and canals to support them. These have made floods to be a very serious
+                challenge that plague many Nigerian cities. The vulnerability of a place on the earth
+                surface to flood is a function of the region’s exposure to the hazard (natural event) and
+                the anthropogenic activities carried out within the catchment area, which impedes the free
+                flow of water .
+                <img src="img/Causes of death in Ibadan.PNG" alt="" width="300px">
+                Flood is among the most devastating natural hazards in the world claiming
+                lives and properties. Nigeria has lost a lot of lives and properties worth millions of naira
+                in the last three (3) decades, directly or indirectly to flood. Reducing the impact of flood
+                can be successful only when detailed knowledge is obtained about the expected
+                frequency, character and magnitude of hazardous events in an area as well as the
+                vulnerability of people, buildings, infrastructures and economic activities in a potential dangerous area.</p>
+            <img src="img/flood deaths.PNG" alt="" width="300px">
+        </section>
+        <section style="height: 5px;">
+
+            
+        </section>
+        <section id='causes'>
+            <h3>Causes of Flooding</h3>
+            <p>A lot of research has been carried out to ascertain the causes of flooding and different
+                reasons have been identified, such include: dumping of refuse over the years has led to
+                the filling up of ponds and blockages of other natural water ways or drainages; high
+                intensity rainfall coupled with a gentle slope for water accumulation; dam failure coupled
+                with almost bare surface; rapid rate of unplanned settlement leading to poor drainage
+                system among many others. The waste generated within Ibadan metropolis comprises
+                mainly of leaves, paper, food waste, tins, glass wares, building construction waste and
+                rags. This is because Ibadan is located in the heart of a rich agricultural land and has a
+                large old and unplanned section. Generally, wastes are being dumped indiscriminately in
+                the city by the populace; in several part of the city wastes are dumped on side drains,
+                roads, streams, canals, open land spaces and bushes. This practice has contributed to the
+                frequent occurrence of flooding in the city. Government has made some efforts to clean
+                up the city through Oyo State Waste Management Authority (OYOSWMA) but there is need for more action to be taken.
+                <br> There are some dump sites that are around surrounding built up areas that will be potentially affected by flooding.
+            </p>
+            <img src="img/waste.PNG" alt="" width="300px">
+            <br>
+            <img src="img/waste2.PNG" alt="" width="300px">
+        </section>
+    </div>
+
+    <div id="menu" style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;"></div>
+
+    <div id='map'></div>
+
+    <div id="feedback">
+        <form style="z-index: 1; position: absolute;">
+            <input type="text " id="fname " placeholder="Full-Name" required><br /><br />
+            <input type="text " id="phnumber " placeholder="Phone Number" required><br />
+            <br />
+            <textarea id="demo" rows="3" cols="25" placeholder="Input address or click the Locate-Me button"></textarea>
+            <button type="button" onclick="getLocation()">Locate-Me</button>
+            <br /><b>ADD A PICTURE</b><br />
+            <input type="file" accept="image/*"> <br />
+            <label for="Gender"><b>Gender</b></label>
+            <input type="radio" name="Gender" value="male" style="cursor: pointer;">Male
+            <input type="radio" name="Gender" value="female" style="cursor: pointer;">Female<br /><br />
+            <textarea type=text rows="15" cols="50" placeholder="Type your reports here "></textarea><br /><br />
+            <button style="background-color: #22be3c; color: white; border-radius: 5px; cursor: pointer;">Submit</button>
+            <button onclick="closeForm()" style="background-color: #fc0707da; color: white; border-radius: 5px; cursor: pointer;">Cancel</button>
+        </form>
+    </div>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiZXZlcnliZWVzIiwiYSI6ImNrNnJwczZtbzA2OHYzbXA5ZXN0eDRoM3kifQ.qSwJMpP4eQNC93dpD7kyIg';
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/everybees/ck70io5013qtx1in38cnropdk',
+            center: [3.9470, 7.3775],
+            zoom: 9.5,
+            pitch: 90
+        });
+
+        var chapters = {
+            'home': {
+                bearing: 27,
+                center: [3.806, 7.409],
+                zoom: 9.5,
+                pitch: 45
+            },
+            'ibadan': {
+                bearing: 27,
+                center: [3.806, 7.409],
+                duration: 3000,
+                zoom: 9.5,
+                pitch: 50,
+                speed: 0.6,
+            },
+            'eleyele': {
+                bearing: 120,
+                center: [3.869, 7.416],
+                duration: 5000,
+                zoom: 12.5,
+                pitch: 41,
+                speed: 0.6,
+            },
+            'flooding': {
+                duration: 6000,
+                bearing: 45,
+                center: [3.9470, 7.3775],
+                zoom: 10,
+                speed: 0.6,
+                pitch: 40
+            },
+            'causes': {
+                duration: 6000,
+                bearing: 45,
+                center: [3.957, 7.357],
+                zoom: 11
+            }
+        };
+
+        window.onscroll = function() {
+            var chapterNames = Object.keys(chapters);
+            for (var i = 0; i < chapterNames.length; i++) {
+                var chapterName = chapterNames[i];
+                if (isElementOnScreen(chapterName)) {
+                    setActiveChapter(chapterName);
+                    break;
+                }
+            }
+        };
+
+        var layerList = document.getElementById('style_menu');
+        var inputs = layerList.getElementsByTagName('input');
+
+        function switchLayer(layer) {
+            var layerId = layer.target.id;
+            map.setStyle('mapbox://styles/mapbox/' + layerId);
+        }
+
+        for (var i = 0; i < inputs.length; i++) {
+            inputs[i].onclick = switchLayer;
+        }
+
+        var nav = new mapboxgl.NavigationControl();
+        map.addControl(nav, 'bottom-right');
+
+        map.addControl(
+            new mapboxgl.GeolocateControl({
+                positionOptions: {
+                    enableHighAccuracy: true
+                },
+                trackUserLocation: true
+            }), 'bottom-right');
+
+        document.getElementById('fly_to_ibadan').addEventListener('click', function() {
+            // Fly to a random location by offsetting the point
+            // by up to 5 degrees.
+            map.flyTo({
+                bearing: 27,
+                center: [3.806, 7.409],
+                center: [3.824436646, 7.396018682],
+                duration: 3000,
+                zoom: 9.5,
+                pitch: 50,
+                speed: 0.6,
+                // style: 'mapbox://styles/mapbox/streets-v11',
+                essential: true // this animation is considered essential with respect to prefers-reduced-motion
+            });
+        });
+
+    
+
+        map.on('load', function() {
+            map.addSource('dem', {
+                'type': 'raster-dem',
+                'url': 'mapbox://mapbox.terrain-rgb'
+            });
+            map.addLayer({
+                    'id': 'hillshading',
+                    'source': 'dem',
+                    'type': 'hillshade'
+                        // insert below waterway-river-canal-shadow;
+                        // where hillshading sits in the Mapbox Outdoors style
+                },
+                'waterway-river-canal-shadow'
+            );
+        });
+
+
+        map.on('style.load', function() {
+            map.rotateTo(45.0, {
+                    duration: 10000,
+                }),
+                map.addSource('built-up', {
+                    'type': 'geojson',
+                    'data': 'https://geoserver.grid-nigeria.org/geoserver/GRIDMaster/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=GRIDMaster:sv_fe_builtuparea&outputFormat=application%2Fjson&authkey=fdfe9a37-d2d0-4210-9a15-25dab5d907fa&CQL_FILTER=state_code=%27OY%27'
+                });
+
+            map.addSource('administrative', {
+                'type': 'geojson',
+                'data': 'https://raw.githubusercontent.com/everybees/ibadan_files/master/ibadan_boundary.geojson?token=ANCY26UWEES2C5T6OTBVALC6KEW2C'
+            });
+
+            map.addSource('proposed-drainage', {
+                'type': 'geojson',
+                'data': 'https://raw.githubusercontent.com/everybees/ibadan_files/master/proposed_drainage_bridges.geojson'
+            });
+
+            map.addSource('proposed-culverts', {
+                'type': 'geojson',
+                'data': 'https://raw.githubusercontent.com/everybees/ibadan_files/master/proposed_drainage_culverts.geojson'
+            });
+
+            map.addSource('existing-buildings', {
+                'type': 'geojson',
+                'data': 'https://raw.githubusercontent.com/everybees/ibadan_files/master/existing_buildings.geojson'
+            });
+
+            map.addSource('extensive_flooding', {
+                'type': 'geojson',
+                'data': 'https://raw.githubusercontent.com/everybees/ibadan_files/master/extensively_flooded_areas_2011.geojson?token=ANCY26RDOW7YY2NLUNZL2IK6KEUWG'
+            });
+
+            map.addSource('flood-prone', {
+                'type': 'geojson',
+                'data': 'https://raw.githubusercontent.com/everybees/ibadan_files/master/flood_prone_areas.geojson'
+            });
+
+            map.addSource('dump-site', {
+                'type': 'geojson',
+                'data': 'https://raw.githubusercontent.com/everybees/ibadan_files/master/dumpsite_ibn.geojson'
+            });
+
+            map.addSource('proposed-dikes', {
+                'type': 'geojson',
+                'data': 'https://raw.githubusercontent.com/everybees/ibadan_files/master/lakes_of_proposed_dikes.geojson'
+            });
+
+            map.addSource('dam-site', {
+                'type': 'geojson',
+                'data': 'https://raw.githubusercontent.com/everybees/ibadan_files/master/dams.geojson?token=ANCY26WV3ZLSIR6YV32HXZS6KEVI2'
+            });
+
+            map.addSource('existing-structures', {
+                'type': 'geojson',
+                'data': 'https://raw.githubusercontent.com/everybees/ibadan_files/master/existing_structures.geojson'
+            });
+
+            map.addSource('water-sources', {
+                'type': 'geojson',
+                'data': 'https://raw.githubusercontent.com/everybees/ibadan_files/master/water__courses.geojson'
+            });
+
+            map.addSource('potential-lakes', {
+                'type': 'geojson',
+                'data': 'https://raw.githubusercontent.com/everybees/ibadan_files/master/potential_lakes.geojson'
+            });
+
+            map.addSource('potential-dams', {
+                'type': 'geojson',
+                'data': 'https://raw.githubusercontent.com/everybees/ibadan_files/master/potential_dam_reserviors.geojson'
+            });
+
+            map.addLayer({
+                'id': 'Extensive Flood Event',
+                'type': 'fill',
+                'source': 'extensive_flooding',
+                // 'source-layer': 'packed-buildings',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'fill-color': '#01037d',
+                    'fill-opacity': 0.5
+                },
+                'filter': ['==', '$type', 'Polygon']
+            });
+
+            map.addLayer({
+                'id': 'Flood Prone Areas',
+                'type': 'fill',
+                'source': 'flood-prone',
+                // 'source-layer': 'packed-buildings',
+                'layout': {
+                    'visibility': 'none',
+                },
+                'paint': {
+                    'fill-color': 'red',
+                    'fill-opacity': 0.4
+                },
+                'filter': ['==', '$type', 'Polygon']
+            });
+
+            map.addLayer({
+                'id': 'Existing Buildings',
+                'type': 'fill',
+                'source': 'existing-buildings',
+                // 'source-layer': 'packed-buildings',
+                'layout': {
+                    'visibility': 'none',
+                },
+                'paint': {
+                    'fill-color': 'blue',
+                    'fill-opacity': 0.4
+                },
+                'filter': ['==', '$type', 'Polygon']
+            });
+
+            map.addLayer({
+                'id': 'Proposed Drainage Bridges',
+                'type': 'circle',
+                'source': 'proposed-drainage',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'circle-radius': 5,
+                    'circle-color': '#400252'
+                },
+                'filter': ['==', '$type', 'Point']
+            });
+
+            map.addLayer({
+                'id': 'Existing Structures',
+                'type': 'circle',
+                'source': 'existing-structures',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'circle-radius': 5,
+                    'circle-color': '#037036'
+                },
+                'filter': ['==', '$type', 'Point']
+            });
+
+            map.addLayer({
+                'id': 'Proposed Culverts',
+                'type': 'circle',
+                'source': 'proposed-culverts',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'circle-radius': 5,
+                    'circle-color': '#517003'
+                },
+                'filter': ['==', '$type', 'Point']
+            });
+
+            map.addLayer({
+                'id': 'Water Sources',
+                'type': 'line',
+                'source': 'water-sources',
+                'layout': {
+                    'visibility': 'none',
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
+                'paint': {
+                    'line-color': 'blue',
+                    'line-width': 1
+                }
+            });
+
+            map.addLayer({
+                'id': 'Built-Up Areas',
+                'type': 'fill',
+                'source': 'built-up',
+                // 'source-layer': 'packed-buildings',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'fill-color': '#cf2e1f',
+                    'fill-opacity': 0.4
+                },
+                'filter': ['==', '$type', 'Polygon']
+            });
+
+            map.addLayer({
+                'id': 'Dam Sites',
+                'type': 'circle',
+                'source': 'dam-site',
+                // 'source-layer': 'refuse-dump',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'circle-radius': 5,
+                    'circle-color': '#022152'
+                },
+                'filter': ['==', '$type', 'Point']
+            });
+
+            map.addLayer({
+                'id': 'state',
+                'type': 'fill',
+                'source': 'administrative',
+                // 'source-layer': 'packed-buildings',
+                'layout': {
+                    'visibility': 'visible'
+                },
+                'paint': {
+                    'fill-color': '#888888',
+                    'fill-opacity': 0.4
+                },
+                'filter': ['==', '$type', 'Polygon']
+            });
+
+            map.addLayer({
+                'id': 'Potential Lakes',
+                'type': 'fill',
+                'source': 'potential-lakes',
+                // 'source-layer': 'packed-buildings',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'fill-color': '#062994',
+                    'fill-opacity': 0.4
+                },
+                'filter': ['==', '$type', 'Polygon']
+            });
+
+            map.addLayer({
+                'id': 'Potential Dams',
+                'type': 'fill',
+                'source': 'potential-dams',
+                // 'source-layer': 'packed-buildings',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'fill-color': '#010d30',
+                    'fill-opacity': 0.8
+                },
+                'filter': ['==', '$type', 'Polygon']
+            });
+
+            map.addLayer({
+                'id': 'Lake of Proposed Dikes',
+                'type': 'fill',
+                'source': 'proposed-dikes',
+                // 'source-layer': 'packed-buildings',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'fill-color': '#03195e',
+                    'fill-opacity': 0.8
+                },
+                'filter': ['==', '$type', 'Polygon']
+            });
+
+            map.addLayer({
+                'id': 'Dump Sites',
+                'type': 'circle',
+                'source': 'dump-site',
+                // 'source-layer': 'refuse-dump',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'circle-radius': 5,
+                    'circle-color': 'black'
+                },
+                'filter': ['==', '$type', 'Point']
+            });
+        });
+
+        var popup = new mapboxgl.Popup({
+            closeButton: false,
+            closeOnClick: false
+        });
+
+        map.on('mouseenter', 'Dump Sites', function(e) {
+            // Change the cursor style as a UI indicator.
+            map.getCanvas().style.cursor = 'pointer';
+
+            var coordinates = e.features[0].geometry.coordinates.slice();
+            var description = e.features[0].properties.dumpsite_t;
+
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+
+            // Populate the popup and set its coordinates
+            // based on the feature found.
+            popup
+                .setLngLat(coordinates)
+                .setHTML(description)
+                .addTo(map);
+        });
+        map.on('mouseleave', 'Dump Sites', function() {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
+        });
+
+        map.on('mouseenter', 'Dam Sites', function(e) {
+            // Change the cursor style as a UI indicator.
+            map.getCanvas().style.cursor = 'pointer';
+
+            var coordinates = e.features[0].geometry.coordinates.slice();
+            var description = e.features[0].properties.location;
+
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+
+            // Populate the popup and set its coordinates
+            // based on the feature found.
+            popup
+                .setLngLat(coordinates)
+                .setHTML(description)
+                .addTo(map);
+        });
+        map.on('mouseleave', 'Dam Sites', function() {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
+        });
+
+        map.on('mouseenter', 'Existing Structures', function(e) {
+            // Change the cursor style as a UI indicator.
+            map.getCanvas().style.cursor = 'pointer';
+
+            var coordinates = e.features[0].geometry.coordinates.slice();
+            var description = e.features[0].properties.Remarks;
+
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+
+            // Populate the popup and set its coordinates
+            // based on the feature found.
+            popup
+                .setLngLat(coordinates)
+                .setHTML(description)
+                .addTo(map);
+        });
+        map.on('mouseleave', 'Existing Structures', function() {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
+        });
+
+        map.on('mouseenter', 'Existing Buildings', function(e) {
+            // Change the cursor style as a UI indicator.
+            map.getCanvas().style.cursor = 'pointer';
+
+            var coordinates = e.features[0].geometry.coordinates.slice();
+            var description = e.features[0].properties.CONDITION;
+
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+
+            // Populate the popup and set its coordinates
+            // based on the feature found.
+            popup
+                .setLngLat(coordinates)
+                .setHTML(description)
+                .addTo(map);
+        });
+        map.on('mouseleave', 'Exisiting Buildings', function() {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
+        });
+
+        map.on('mouseenter', 'Water Sources', function(e) {
+            // Change the cursor style as a UI indicator.
+            map.getCanvas().style.cursor = 'pointer';
+
+            var coordinates = e.features[0].geometry.coordinates.slice();
+            var description = e.features[0].properties.Name;
+
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+
+            // Populate the popup and set its coordinates
+            // based on the feature found.
+            popup
+                .setLngLat(coordinates)
+                .setHTML(description)
+                .addTo(map);
+        });
+        map.on('mouseleave', 'Water Sources', function() {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
+        });
+
+        var toggleableLayerIds = ['Built-Up Areas', 'Dump Sites', 'Existing Buildings', 'Existing Structures', 'Extensive Flood Event', 'Water Sources', 'Dam Sites', 'Flood Prone Areas', 'Proposed Culverts', 'Proposed Drainage Bridges',
+            'Lake of Proposed Dikes', 'Potential Lakes', 'Potential Dams'
+        ];
+
+        for (var i = 0; i < toggleableLayerIds.length; i++) {
+            var id = toggleableLayerIds[i];
+
+            var link = document.createElement('a');
+            link.href = '#';
+            link.className = 'active';
+            link.textContent = id;
+
+            link.onclick = function(e) {
+                var clickedLayer = this.textContent;
+                e.preventDefault();
+                e.stopPropagation();
+
+                var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+
+                if (visibility === 'visible') {
+                    map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+                    this.className = '';
+                } else {
+                    this.className = 'active';
+                    map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+                }
+            };
+            var layers = document.getElementById('menu');
+            layers.appendChild(link);
+        }
+
+        var layerList = document.getElementById('style_menu');
+        var inputs = layerList.getElementsByTagName('input');
+
+        function switchLayer(layer) {
+            var layerId = layer.target.id;
+            map.setStyle('mapbox://styles/everybees/' + layerId);
+        }
+
+        for (var i = 0; i < inputs.length; i++) {
+            inputs[i].onclick = switchLayer;
+        }
+
+        var activeChapterName = 'home';
+
+        function setActiveChapter(chapterName) {
+            if (chapterName === activeChapterName) return;
+
+            if (chapterName === "home") {
+                map.setLayoutProperty('Dump Sites', 'visibility', 'none');
+                map.setLayoutProperty('Dam Sites', 'visibility', 'none');
+                map.setLayoutProperty('Water Sourses', 'visibility', 'none');
+                map.setLayoutProperty('Flood Prone Areas', 'visibility', 'none');
+                map.setLayoutProperty('Existing Structures', 'visibility', 'none');
+                map.setLayoutProperty('Water Sources', 'visibility', 'none');
+                map.setLayoutProperty('Built-Up Areas', 'visibility', 'none');
+                removeiso();
+
+                map.rotateTo(45.0, {
+                    duration: 10000
+                });
+            } else if (chapterName === "ibadan") {
+                map.setLayoutProperty('Extensive Flood Event', 'visibility', 'none');
+                map.setLayoutProperty('Dump Sites', 'visibility', 'none');
+                map.setLayoutProperty('Built-Up Areas', 'visibility', 'none');
+                map.setLayoutProperty('Dam Sites', 'visibility', 'none');
+                map.setLayoutProperty('Water Sources', 'visibility', 'none');
+                map.setLayoutProperty('Flood Prone Areas', 'visibility', 'none');
+                map.setLayoutProperty('Existing Structures', 'visibility', 'none');
+
+            } else if (chapterName === "eleyele") {
+                map.setLayoutProperty('Extensive Flood Event', 'visibility', 'visible');
+                map.setLayoutProperty('Dump Sites', 'visibility', 'none');
+                map.setLayoutProperty('Built-Up Areas', 'visibility', 'none');
+                map.setLayoutProperty('Dam Sites', 'visibility', 'none');
+                map.setLayoutProperty('Water Sources', 'visibility', 'visible');
+                map.setLayoutProperty('Flood Prone Areas', 'visibility', 'none');
+                map.setLayoutProperty('Existing Structures', 'visibility', 'none');
+
+            } else if (chapterName === "flooding") {
+                map.setLayoutProperty('Water Sources', 'visibility', 'visible');
+                map.setLayoutProperty('Dam Sites', 'visibility', 'visible');
+                map.setLayoutProperty('Flood Prone Areas', 'visibility', 'visible');
+                map.setLayoutProperty('Dump Sites', 'visibility', 'none');
+                map.setLayoutProperty('Built-Up Areas', 'visibility', 'none');
+                map.setLayoutProperty('Extensive Flood Event', 'visibility', 'none');
+
+            } else if (chapterName === "causes") {
+                map.setLayoutProperty('Dump Sites', 'visibility', 'visible');
+                map.setLayoutProperty('Dam Sites', 'visibility', 'visible');
+                map.setLayoutProperty('Built-Up Areas', 'visibility', 'visible');
+                map.setLayoutProperty('Existing Structures', 'visibility', 'none');
+                map.setLayoutProperty('Flood Prone Areas', 'visibility', 'none');
+                map.setLayoutProperty('Extensive Flood Event', 'visibility', 'none');
+
+            }
+
+            map.flyTo(chapters[chapterName]);
+
+            document.getElementById(chapterName).setAttribute('class', 'active');
+            document.getElementById(activeChapterName).setAttribute('class', '');
+
+            activeChapterName = chapterName;
+        }
+
+        function isElementOnScreen(id) {
+            var element = document.getElementById(id);
+            var bounds = element.getBoundingClientRect();
+            return bounds.top < window.innerHeight && bounds.bottom > 0;
+        }
+
+        function openForm() {
+            var feedbackForm = document.getElementById("feedback").style.display;
+            if (feedbackForm == "none") {
+                document.getElementById("feedback").style.display = "block";
+                document.getElementById("map").style.filter = "blur(5px)";
+                document.getElementById('menu').style.display = "none";
+                document.getElementById('storycard').style.display = "none";
+                document.getElementById('about').style.display = "none";
+
+            } else {
+                document.getElementById("feedback").style.display = "none";
+                document.getElementById("map").style.filter = "blur(0px)";
+            }
+
+        }
+
+        function closeForm() {
+            document.getElementById("feedback").style.display = "none";
+            document.getElementById("map").style.filter = "blur(0px)";
+        }
+
+        var x = document.getElementById("demo");
+
+        function getLocation() {
+            navigator.geolocation.getCurrentPosition(showPosition);
+        }
+
+        function showPosition(position) {
+            x.innerHTML = "Latitude: " + position.coords.latitude +
+                "\nLongitude: " + position.coords.longitude;
+        }
+
+        function openLayers() {
+            if (document.getElementById('menu').style.display == "block") {
+                document.getElementById('menu').style.display = "none";
+            } else {
+                document.getElementById('menu').style.display = "block";
+                document.getElementById("feedback").style.display = "none";
+                document.getElementById("map").style.filter = "blur(0px)";
+                document.getElementById('storycard').style.display = "none";
+                document.getElementById('about').style.display = "none";
+            }
+        }
+
+        function openStory() {
+            if (document.getElementById('storycard').style.display == "block") {
+                document.getElementById('storycard').style.display = "none";
+            } else {
+                document.getElementById('storycard').style.display = "block";
+                document.getElementById('menu').style.display = "none";
+                document.getElementById("feedback").style.display = "none";
+                document.getElementById("map").style.filter = "blur(0px)";
+                document.getElementById('about').style.display = "none";
+            }
+        }
+
+        function aboutpage() {
+            if (document.getElementById('about').style.display == "block") {
+                document.getElementById('about').style.display = "none";
+                document.getElementById('storycard').style.display = "block";
+                document.getElementById("map").style.filter = "blur(0px)";
+            } else {
+                document.getElementById('about').style.display = "block";
+                document.getElementById('menu').style.display = "none";
+                document.getElementById("feedback").style.display = "none";
+                document.getElementById('storycard').style.display = "none";
+                document.getElementById("map").style.filter = "blur(70px)";
+            }
+
+        }
+    </script>
+
+</body>
+
+
+</html>
